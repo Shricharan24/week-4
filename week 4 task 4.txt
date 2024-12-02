@@ -1,0 +1,50 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <iterator>
+#include <string>
+using namespace std;
+ 
+struct Control {
+    int id;
+    string type;
+    string state;
+    bool operator<(const Control& other) const { return id < other.id; }
+    bool operator==(const Control& other) const { return id == other.id; }
+};
+ 
+int main() {
+    vector<Control> controls1 = {{3, "button", "visible"}, {1, "slider", "disabled"}, {5, "button", "invisible"}};
+    vector<Control> controls2 = {{4, "slider", "visible"}, {1, "button", "disabled"}, {6, "slider", "disabled"}};
+ 
+    sort(controls1.begin(), controls1.end());
+    stable_sort(controls2.begin(), controls2.end());
+ 
+    auto lower = lower_bound(controls1.begin(), controls1.end(), Control{4, "", ""});
+    auto upper = upper_bound(controls1.begin(), controls1.end(), Control{4, "", ""});
+    cout << "Lower Bound ID: " << (lower != controls1.end() ? lower->id : -1) << ", Upper Bound ID: " << (upper != controls1.end() ? upper->id : -1) << endl;
+ 
+    vector<Control> merged(controls1.size() + controls2.size());
+    merge(controls1.begin(), controls1.end(), controls2.begin(), controls2.end(), merged.begin());
+    cout << "Merged List: " << endl;
+    for (const auto& ctrl : merged) std::cout << ctrl.id << " ";
+
+    controls1.insert(controls1.end(), controls2.begin(), controls2.end());
+    inplace_merge(controls1.begin(), controls1.begin() + controls1.size() / 2, controls1.end());
+    cout << "\nIn-place Merged List: " <<endl;
+    for (const auto& ctrl : controls1) 
+    cout << ctrl.id << " " << endl;
+ 
+    vector<Control> unionResult, intersectionResult;
+    set_union(controls1.begin(), controls1.end(), controls2.begin(), controls2.end(), back_inserter(unionResult));
+    set_intersection(controls1.begin(), controls1.end(), controls2.begin(), controls2.end(), back_inserter(intersectionResult));
+ 
+    cout << "\nSet Union:\n";
+    for (const auto& ctrl : unionResult)
+    cout << ctrl.id << " " << endl;
+    cout << "\nSet Intersection: " << endl;
+    for (const auto& ctrl : intersectionResult) 
+    cout << ctrl.id << " " << endl;
+ 
+    return 0;
+};
